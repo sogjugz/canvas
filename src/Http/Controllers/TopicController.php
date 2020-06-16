@@ -19,8 +19,7 @@ class TopicController extends Controller
     public function index(): JsonResponse
     {
         return response()->json(
-            Topic::forCurrentUser()
-                 ->latest()
+            Topic::latest()
                  ->withCount('posts')
                  ->paginate(), 200
         );
@@ -35,19 +34,17 @@ class TopicController extends Controller
      */
     public function show($id = null): JsonResponse
     {
-        if (Topic::forCurrentUser()->pluck('id')->contains($id) || $this->isNewTopic($id)) {
-            if ($this->isNewTopic($id)) {
-                return response()->json(Topic::make([
-                    'id' => Uuid::uuid4(),
-                ]), 200);
-            } else {
-                $topic = Topic::find($id);
+        if ($this->isNewTopic($id)) {
+            return response()->json(Topic::make([
+                'id' => Uuid::uuid4(),
+            ]), 200);
+        } else {
+            $topic = Topic::find($id);
 
-                if ($topic) {
-                    return response()->json($topic, 200);
-                } else {
-                    return response()->json(null, 301);
-                }
+            if ($topic) {
+                return response()->json($topic, 200);
+            } else {
+                return response()->json(null, 301);
             }
         }
     }

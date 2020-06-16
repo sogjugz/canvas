@@ -19,8 +19,7 @@ class TagController extends Controller
     public function index(): JsonResponse
     {
         return response()->json(
-            Tag::forCurrentUser()
-               ->latest()
+            Tag::latest()
                ->withCount('posts')
                ->paginate(), 200
         );
@@ -35,19 +34,17 @@ class TagController extends Controller
      */
     public function show($id = null): JsonResponse
     {
-        if (Tag::forCurrentUser()->pluck('id')->contains($id) || $this->isNewTag($id)) {
-            if ($this->isNewTag($id)) {
-                return response()->json(Tag::make([
-                    'id' => Uuid::uuid4(),
-                ]), 200);
-            } else {
-                $tag = Tag::find($id);
+        if ($this->isNewTag($id)) {
+            return response()->json(Tag::make([
+                'id' => Uuid::uuid4(),
+            ]), 200);
+        } else {
+            $tag = Tag::find($id);
 
-                if ($tag) {
-                    return response()->json($tag, 200);
-                } else {
-                    return response()->json(null, 301);
-                }
+            if ($tag) {
+                return response()->json($tag, 200);
+            } else {
+                return response()->json(null, 301);
             }
         }
     }

@@ -11,6 +11,9 @@
 <a href="https://packagist.org/packages/cnvs/canvas"><img src="https://poser.pugx.org/cnvs/canvas/license"></a>
 </p>
 
+## Note
+Forked from https://github.com/cnvs/canvas with a few modifications for specific purpose.
+
 ## Introduction
 
 Canvas is a fully open source package to extend your existing [Laravel](https://laravel.com) application and get you up-and-running with a blog in 

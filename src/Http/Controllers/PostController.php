@@ -23,17 +23,17 @@ class PostController extends Controller
         switch (request()->query('type')) {
             case 'draft':
                 return response()->json([
-                    'posts' => Post::forCurrentUser()->draft()->latest()->withCount('views')->paginate(),
-                    'draftCount' => Post::forCurrentUser()->draft()->count(),
-                    'publishedCount' => Post::forCurrentUser()->published()->count(),
+                    'posts' => Post::draft()->latest()->withCount('views')->paginate(),
+                    'draftCount' => Post::draft()->count(),
+                    'publishedCount' => Post::published()->count(),
                 ], 200);
                 break;
 
             case 'published':
                 return response()->json([
-                    'posts' => Post::forCurrentUser()->published()->latest()->withCount('views')->paginate(),
-                    'draftCount' => Post::forCurrentUser()->draft()->count(),
-                    'publishedCount' => Post::forCurrentUser()->published()->count(),
+                    'posts' => Post::published()->latest()->withCount('views')->paginate(),
+                    'draftCount' => Post::draft()->count(),
+                    'publishedCount' => Post::published()->count(),
                 ], 200);
                 break;
 
@@ -64,15 +64,11 @@ class PostController extends Controller
                 'topics' => Topic::forCurrentUser()->get(['name', 'slug']),
             ]);
         } else {
-            if (Post::forCurrentUser()->pluck('id')->contains($id)) {
-                return response()->json([
-                    'post' => Post::forCurrentUser()->with('tags:name,slug', 'topic:name,slug')->find($id),
-                    'tags' => Tag::forCurrentUser()->get(['name', 'slug']),
-                    'topics' => Topic::forCurrentUser()->get(['name', 'slug']),
-                ]);
-            } else {
-                return response()->json(null, 404);
-            }
+            return response()->json([
+                'post' => Post::with('tags:name,slug', 'topic:name,slug')->find($id),
+                'tags' => Tag::all(['name', 'slug']),
+                'topics' => Topic::all(['name', 'slug']),
+            ]);
         }
     }
 
@@ -175,7 +171,7 @@ class PostController extends Controller
     private function syncTopic($incomingTopic): array
     {
         if ($incomingTopic) {
-            $topic = Topic::forCurrentUser()->where('slug', $incomingTopic['slug'])->first();
+            $topic = Topic::where('slug', $incomingTopic['slug'])->first();
 
             if (! $topic) {
                 $topic = Topic::create([
@@ -201,7 +197,7 @@ class PostController extends Controller
     private function syncTags(array $incomingTags): array
     {
         if ($incomingTags) {
-            $tags = Tag::forCurrentUser()->get(['id', 'name', 'slug']);
+            $tags = Tag::all(['id', 'name', 'slug']);
 
             return collect($incomingTags)->map(function ($incomingTag) use ($tags) {
                 $tag = $tags->where('slug', $incomingTag['slug'])->first();

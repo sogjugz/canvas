@@ -23,7 +23,7 @@ class CreateCanvasTables extends Migration
             $table->string('featured_image')->nullable();
             $table->string('featured_image_caption')->nullable();
             $table->string('user_id')->index();
-            $table->json('meta')->nullable();
+            $table->text('meta')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
